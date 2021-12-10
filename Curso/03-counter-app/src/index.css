@@ -1,0 +1,14 @@
+html, body {
+    color:azure;
+    background-color: #21232a;
+    font-family: 'Helvetica Neue', 'Courier New', Courier, monospace;
+    font-size: 1.3rem;
+    padding: 70px;
+    margin: 0 auto;
+}
+
+button {
+    font-size: 1.3rem;
+    margin: 5px;
+    padding: 5px;
+}

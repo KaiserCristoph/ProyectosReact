@@ -1,0 +1,21 @@
+#uploadDesc{
+    /* height: 500px; */
+}
+
+#mainCont{
+    height: 100%;
+    padding: 5% 20%;
+}
+
+#mainContMenu{
+    height: 100%;
+    padding: 5% 20%;
+}
+
+#fileSelector{
+    display: none;
+}
+
+#largeRow{
+    width: 1000px;
+}

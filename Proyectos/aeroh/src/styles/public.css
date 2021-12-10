@@ -1,0 +1,21 @@
+body{
+    /* background-image: url("../media/public-background.png"); */
+    background-color: white;
+}
+
+#root{
+    height: 100%;
+}
+
+.container{
+    height: 100%;
+}
+
+.grid{
+    height: 100%;
+}
+
+.column{
+    border-radius: 5px;
+    background-color:white;
+}
