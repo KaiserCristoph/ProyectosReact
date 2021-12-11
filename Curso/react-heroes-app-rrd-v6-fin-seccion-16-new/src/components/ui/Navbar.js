@@ -1,8 +1,7 @@
 import React, { useContext } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-
+import { startLogout } from '../../actions/auth'
 import { AuthContext } from '../../auth/authContext';
-import { types } from '../../types/types';
 
 
 export const Navbar = () => {
@@ -13,19 +12,14 @@ export const Navbar = () => {
 
 
     const handleLogout = () => {
-        
-        dispatch({ type: types.logout });
-
-        navigate('/login', {
-            replace: true
-        });
+        dispatch(startLogout())
     }
 
     return (
         <nav className="navbar navbar-expand-sm navbar-dark bg-dark">
-            
-            <Link 
-                className="navbar-brand" 
+
+            <Link
+                className="navbar-brand"
                 to="/"
             >
                 Asociaciones
@@ -34,22 +28,22 @@ export const Navbar = () => {
             <div className="navbar-collapse">
                 <div className="navbar-nav">
 
-                    <NavLink 
-                        className={ ({ isActive }) => 'nav-item nav-link ' + (isActive ? 'active' : '') }
+                    <NavLink
+                        className={({ isActive }) => 'nav-item nav-link ' + (isActive ? 'active' : '')}
                         to="/marvel"
                     >
                         Marvel
                     </NavLink>
 
-                    <NavLink 
-                        className={ ({ isActive }) => 'nav-item nav-link ' + (isActive ? 'active' : '') }
+                    <NavLink
+                        className={({ isActive }) => 'nav-item nav-link ' + (isActive ? 'active' : '')}
                         to="/dc"
                     >
                         DC
                     </NavLink>
 
-                    <NavLink 
-                        className={ ({ isActive }) => 'nav-item nav-link ' + (isActive ? 'active' : '') }
+                    <NavLink
+                        className={({ isActive }) => 'nav-item nav-link ' + (isActive ? 'active' : '')}
                         to="/search"
                     >
                         Search
@@ -61,12 +55,12 @@ export const Navbar = () => {
                 <ul className="navbar-nav ml-auto">
 
                     <span className="nav-item nav-link text-info">
-                        { user.name }
+                        {user.name}
                     </span>
-                    
-                    <button 
-                        className="nav-item nav-link btn" 
-                        onClick={ handleLogout }
+
+                    <button
+                        className="nav-item nav-link btn"
+                        onClick={handleLogout}
                     >
                         Logout
                     </button>

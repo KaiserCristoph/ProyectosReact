@@ -8,20 +8,22 @@ const modelReducer = (state = {}, action) =>{
                 modelAdded: {
                     ...action.payload
                 }
-            }
+            };
         case types.modelActive:
             return{
                 ...state,
                 active: {
                     ...action.payload
                 }
-            }
+            };
         case types.modelDelete:
             return {
                 ...state,
                 active: null,
                 modelAdded: null
-            } 
+            };
+        case types.modelUpdate:
+            return state;
         default:
             return state;
     }

@@ -1,70 +1,62 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { Form, Grid, Header, Icon, Segment, Button } from "semantic-ui-react"
+import { Form, Grid, Header, Icon, Segment, Button, Select } from "semantic-ui-react"
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from '../../hooks/useForm';
 
 import '../../styles/upload.css'
-import { UploadNewModel } from "../../actions/models";
-import { fileUpload } from "../../helpers/fileUpload";
+import { updateModel } from "../../actions/models";
 import { loadAllManufacturers } from "../../helpers/loadManufacturers";
 import { Link } from "react-router-dom";
 
-// const ModelPage = ({ id, image, name, activeYears, description, amountProduced }) => {
-const UploadModels = () => {
-
+const UpdateModels = () => {
     const dispatch = useDispatch();
-    const [file, setCurrentFile] = useState(null)
+    const navigate = useNavigate();
+    const { id, image, name, lifeSpan, description, amountProduced, manufacturer } = useSelector(state => state.model.active);
+
     const [currentManufacturer, setCurrentManufacturer] = useState([0])
     const [options, setOptions] = useState([])
 
-    const navigate = useNavigate();
-
     useEffect(() => {
         loadAllManufacturers().then(manufacturers => {
-
-            const manufacturersOptions = manufacturers.map((manufacturer, i, row) => {
-                const { name, id } = manufacturer
+            const manufacturersOptions = manufacturers.map((rowManufacturer, i, row) => {
+                const { name, id } = rowManufacturer
                 return { key: (i + 1), text: name, id: id, value: i }
-            })
+            });
 
-            setOptions(manufacturersOptions)
+            setOptions(manufacturersOptions);
         })
-    }, [])
+    }, []);
 
     const [formValues, handleInputChange] = useForm({
-        name: "",
-        from: "",
-        until: "",
-        description: "",
-        amountProduced: ""
+        newName: name,
+        from: lifeSpan && lifeSpan.split(' ')[0],
+        until: lifeSpan && lifeSpan.split(' ')[2],
+        newDescription: description,
+        newAmountProduced: amountProduced
     });
 
-    const { name, from, until, description, amountProduced } = formValues;
+    const { newName, from, until, newDescription, newAmountProduced } = formValues;
 
-    const handleAddNew = async () => {
-        if (file != null) {
-            const imageUrl = await fileUpload(file);
+    const handleUpload = async () => {
+        const imageUrl = image;
 
-            if (imageUrl != null) {
-                dispatch(UploadNewModel({
-                    image: imageUrl,
-                    name,
-                    lifeSpan: from.concat(" - ", until),
-                    description,
-                    amountProduced,
-                    manufacturer: options[currentManufacturer].id
-                }, navigate));
-            } else {
-                console.log("No url")
-            }
+        if (imageUrl != null) {
+            dispatch(updateModel({
+                id,
+                image: imageUrl,
+                name: newName,
+                lifeSpan: from.concat(" - ", until),
+                description: newDescription,
+                amountProduced: newAmountProduced,
+                manufacturer: options[currentManufacturer].id
+            }, navigate));
         } else {
-            console.log("No file")
+            console.log("No url")
         }
     };
 
     const changeDropOption = (event, data) => {
-        console.log(data.value)
         setCurrentManufacturer(data.value)
     }
 
@@ -74,11 +66,11 @@ const UploadModels = () => {
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            setCurrentFile(file)
-        } else {
-            setCurrentFile(null)
-        }
+        // if (file) {
+        //     setCurrentFile(file)
+        // } else {
+        //     setCurrentFile(null)
+        // }
     }
 
     return (
@@ -104,10 +96,10 @@ const UploadModels = () => {
                                         iconPosition='left'
                                         label='Model Name'
                                         placeholder='Name...'
-                                        name="name"
+                                        name="newName"
                                         type="text"
                                         autoComplete="off"
-                                        value={name}
+                                        value={newName}
                                         onChange={handleInputChange}
                                     />
                                 </Segment>
@@ -145,10 +137,10 @@ const UploadModels = () => {
                                         iconPosition='left'
                                         label='Units Built'
                                         placeholder='Units Built...'
-                                        name="amountProduced"
+                                        name="newAmountProduced"
                                         type="text"
                                         autoComplete="off"
-                                        value={amountProduced}
+                                        value={newAmountProduced}
                                         onChange={handleInputChange}
                                     />
                                 </Segment>
@@ -171,8 +163,10 @@ const UploadModels = () => {
                                     </Form.Field>
                                 </Segment>
                                 <Segment color='teal' textAlign="center">
-                                    <Form.Select
-                                        fluid
+                                    <Form.Field
+                                        control={Select}
+                                        search
+                                        id="manufacturerSelect"
                                         label='Manufacturer'
                                         placeholder='Manufacturer'
 
@@ -188,10 +182,10 @@ const UploadModels = () => {
 
                                         label='Description'
                                         placeholder='Add some history or facts about this model...'
-                                        name="description"
+                                        name="newDescription"
                                         type="text"
                                         autoComplete="off"
-                                        value={description}
+                                        value={newDescription}
                                         onChange={handleInputChange}
                                     />
                                 </Segment>
@@ -202,11 +196,11 @@ const UploadModels = () => {
                                         primary
                                         content='Upload'
                                         type="submit"
-                                        onClick={handleAddNew}
+                                        onClick={handleUpload}
                                     />
                                 </Segment>
                                 <Segment textAlign="center">
-                                    <Button secondary as={Link} to="/users/upload/">Go Back</Button>
+                                    <Button secondary as={Link} to={`/models/${id}`}>Go Back</Button>
                                 </Segment>
                             </Segment.Group>
                         </Segment.Group>
@@ -219,5 +213,5 @@ const UploadModels = () => {
 };
 
 export {
-    UploadModels as default
+    UpdateModels as default
 };

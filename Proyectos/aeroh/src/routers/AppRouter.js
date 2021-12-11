@@ -1,10 +1,10 @@
-import {useEffect, useState } from 'react';
-import {Routes, Route, Navigate} from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
-import {useDispatch} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import {authInstance} from '../firebase/firebase-config';
-import {onAuthStateChanged} from 'firebase/auth';
+import { authInstance } from '../firebase/firebase-config';
+import { onAuthStateChanged } from 'firebase/auth';
 
 import PrivateRoute from './PrivateRoute';
 import DashboardRoutes from './DashboardRoutes';
@@ -12,7 +12,7 @@ import DashboardRoutes from './DashboardRoutes';
 import LoginScreen from '../components/auth/LoginScreen';
 import RegisterScreen from '../components/auth/RegisterScreen';
 
-import {login} from '../actions/auth';
+import { login } from '../actions/auth';
 
 const AppRouter = () => {
 
@@ -20,12 +20,13 @@ const AppRouter = () => {
 
     const [checking, setChecking] = useState(true);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const auth = useSelector(state => state.auth)
 
     useEffect(() => {
-        
+
         onAuthStateChanged(authInstance, user => {
             if (user?.uid) {
-                dispatch( login(user.uid, user.displayName) );
+                dispatch(login(user.uid, user.displayName));
                 setIsLoggedIn(true);
             } else {
                 setIsLoggedIn(false);
@@ -33,48 +34,50 @@ const AppRouter = () => {
 
             setChecking(false);
         });
-        
-    }, [dispatch, setChecking, setIsLoggedIn])
+
+    }, [])
 
 
-    if ( checking ) {
+    if (checking) {
         return (
             <p>Espere...</p>
         )
     }
 
-    
+    console.log('Login: ', isLoggedIn)
+
+
     return (
         <Routes>
             {/* Public Routes */}
-            {!isLoggedIn && ( <>
-                <Route 
+            {!isLoggedIn && (<>
+                <Route
                     path="/auth/login"
-                    element={<LoginScreen/>}
+                    element={<LoginScreen />}
                 />
 
-                <Route 
+                <Route
                     path="/auth/register"
-                    element={<RegisterScreen/>}
+                    element={<RegisterScreen />}
                 />
 
-                <Route 
+                <Route
                     path="/auth/*"
-                    element={<Navigate to="/auth/login"/>}
+                    element={<Navigate to="/auth/login" />}
                 />
             </>)}
 
 
-            <Route path="/*" element={ 
-                    <PrivateRoute isAuthenticated={isLoggedIn}>
-                        <DashboardRoutes />
-                    </PrivateRoute>
-                } 
+            <Route path="/*" element={
+                <PrivateRoute isAuthenticated={isLoggedIn}>
+                    <DashboardRoutes />
+                </PrivateRoute>
+            }
             />
         </Routes>
     )
 }
 
-export{
+export {
     AppRouter
 }

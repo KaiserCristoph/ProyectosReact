@@ -3,7 +3,8 @@ import { useDispatch } from "react-redux";
 import { useParams } from "react-router";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Container, Divider, Grid, Header, Icon, Image, Label, Segment } from "semantic-ui-react"
-import { activeModel, startDeleting } from "../../actions/models";
+import { activeModel, deleteModel } from "../../actions/models";
+import { loadManufacturerById } from "../../helpers/loadManufacturers";
 import { loadModelById } from "../../helpers/loadModels";
 import "../../styles/entPage.css"
 
@@ -12,6 +13,7 @@ const ModelPage = () => {
     const navigate = useNavigate();
     const { modelId } = useParams();
     const [model, setModel] = useState({})
+    const [manufacturerData, setManufacturerData] = useState({name: 'N/A', id: 'N/A'})
 
     useEffect(() => {
         let modelRaw = loadModelById(modelId);
@@ -19,13 +21,16 @@ const ModelPage = () => {
         modelRaw.then(modelData => {
             dispatch(activeModel(modelData.id, modelData))
             setModel(modelData)
+            loadManufacturerById(modelData.manufacturer).then(manufacturer => {
+                setManufacturerData(manufacturer)
+            })
         })
     }, [])
 
-    const { id, image, name, lifeSpan, description, amountProduced } = model
+    const { id, image, name, lifeSpan, description, amountProduced, manufacturer} = model
 
     const handleDelete = () => {
-        dispatch(startDeleting(id, navigate));
+        dispatch(deleteModel(id, navigate));
     }
     return (
         <>
@@ -36,8 +41,8 @@ const ModelPage = () => {
                     </Grid.Column>
                     <Grid.Column id="infoCol" verticalAlign='middle'>
                         <Container textAlign='justified'>
-                            <Label color='red'>
-                                Model
+                            <Label as={Link} to={`/manufacturers/${manufacturerData.id}`} color='red'>
+                                {manufacturerData.name} Model
                             </Label>
                             <Header as='h3' textAlign='center'>{name}</Header>
                             <p>

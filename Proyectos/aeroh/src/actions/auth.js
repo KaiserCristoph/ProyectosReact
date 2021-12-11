@@ -53,11 +53,12 @@ export const startRegisterWithEmailPasswordName = (email, password, name) => {
     };
 };
 
-export const startLogout = () => {
-    return async (dispatch) => {
-        await signOut();
+export const startLogout = (navigate) => {
+    return async(dispatch) => {
+        await signOut(getAuth());
 
         dispatch(logout());
+        navigate('/auth/login')
     }
 }
 

@@ -6,10 +6,11 @@ import Manufacturers from '../components/aeroh/Manufacturers';
 import ModelsPage from '../components/aeroh/ModelPage';
 import Models from '../components/aeroh/Models';
 import NavBar from '../components/aeroh/NavBar';
-import UpdateModels from '../components/userActions/UpdateModels';
+import UpdateManufacturer from '../components/userActions/UpdateManufacturer';
+import UpdateModel from '../components/userActions/UpdateModel';
 import UploadManufacturer from '../components/userActions/UploadManufacturer';
 import UploadMenu from '../components/userActions/UploadMenu';
-import UploadModels from '../components/userActions/UploadModels';
+import UploadModel from '../components/userActions/UploadModel';
 
 const DashboardRoutes = () => {
     return (
@@ -22,6 +23,10 @@ const DashboardRoutes = () => {
                         element={<Manufacturers />} 
                     />
                     <Route 
+                        path="/manufacturers/update/:manufacturerId" 
+                        element={<UpdateManufacturer />} 
+                    />
+                    <Route 
                         path="/manufacturers/:manufacturerId" 
                         element={<ManufacturersPage />} 
                     />
@@ -31,7 +36,7 @@ const DashboardRoutes = () => {
                     />
                     <Route 
                         path="/models/update/:modelId" 
-                        element={<UpdateModels />} 
+                        element={<UpdateModel />} 
                     />
                     <Route 
                         path="/models/:modelId" 
@@ -48,7 +53,7 @@ const DashboardRoutes = () => {
                     />
                     <Route 
                         path="/users/upload/model"
-                        element={<UploadModels />} 
+                        element={<UploadModel />} 
                     />
 
                     <Route 

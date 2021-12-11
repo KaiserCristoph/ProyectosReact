@@ -1,8 +1,8 @@
 import { db } from "../firebase/firebase-config";
-import { collection, addDoc, deleteDoc, doc } from "firebase/firestore";
+import { collection, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { types } from "../types/types";
 
-const UploadNewModel = ({
+const uploadNewModel = ({
     image,
     name,
     lifeSpan,
@@ -23,7 +23,7 @@ const UploadNewModel = ({
 
         try {
             const docRef = await addDoc(collection(db, `models`), newModel)
-            await dispatch(addNewModel(docRef.id, newModel))
+            await dispatch(modelAdded(docRef.id, newModel))
             navigate(`/models/${docRef.id}`)
         } catch (e) {
             console.log(e)
@@ -36,34 +36,58 @@ const activeModel = (id, model) => ({
     payload: {
         id,
         ...model
-    } 
+    }
 });
 
-const addNewModel = ( id, model ) => ({
+const modelAdded = (id, model) => ({
     type: types.modelAdd,
     payload: {
         id, ...model
     }
 })
 
-const startDeleting = ( id , navigate) => {
-    return async( dispatch, getState ) => {
+const updateModel = (model, navigate) => {
+    return async (dispatch, getState) => {
+        const modelToUpdate = { ...model };
+        delete modelToUpdate.id
+
+        try {
+            await updateDoc(doc(db, `/models/${model.id}`), modelToUpdate);
+            await dispatch(modelUpdated(model.id, model))
+            navigate(`/models/${model.id}`)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+};
+
+const modelUpdated = (id, model) => ({
+    type: types.modelUpdate,
+    payload: {
+        id,
+        ...model
+    }
+});
+
+const deleteModel = (id, navigate) => {
+    return async (dispatch, getState) => {
         await deleteDoc(doc(db, `/models/${id}`));
- 
+
         dispatch(deleteModel(id));
         navigate(`/models/`);
     }
 }
 
-const deleteModel = (id) => ({
+const modelDeleted = (id) => ({
     type: types.modelDelete,
     payload: id
 });
 
 export {
-    UploadNewModel,
+    uploadNewModel,
     activeModel,
-    addNewModel,
-    startDeleting,
-    deleteModel
+    modelAdded,
+    deleteModel,
+    modelDeleted,
+    updateModel
 };

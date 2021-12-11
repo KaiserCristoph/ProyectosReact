@@ -1,79 +1,70 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { useParams } from "react-router-dom";
-import { Form, Grid, Header, Icon, Segment, Button } from "semantic-ui-react"
-import { useDispatch, useSelector } from "react-redux";
+import { Form, Grid, Header, Icon, Segment, Button, Select } from "semantic-ui-react"
+import { useDispatch } from "react-redux";
 import { useForm } from '../../hooks/useForm';
 
 import '../../styles/upload.css'
-import { UploadNewModel } from "../../actions/models";
+import { uploadNewModel } from "../../actions/models";
+import { fileUpload } from "../../helpers/fileUpload";
 import { loadAllManufacturers } from "../../helpers/loadManufacturers";
 import { Link } from "react-router-dom";
 
-const UpdateModels = () => {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const { id, image, name, lifeSpan, description, amountProduced, manufacturer } = useSelector(state => state.model.active);
+// const ModelPage = ({ id, image, name, activeYears, description, amountProduced }) => {
+const UploadModel = () => {
 
+    const dispatch = useDispatch();
+    const [file, setCurrentFile] = useState(null)
     const [currentManufacturer, setCurrentManufacturer] = useState([0])
     const [options, setOptions] = useState([])
 
-
+    const navigate = useNavigate();
 
     useEffect(() => {
         loadAllManufacturers().then(manufacturers => {
-            let currentValue = 0
-            const manufacturersOptions = manufacturers.map((rowManufacturer, i, row) => {
-                const { name, id } = rowManufacturer
-                if (id === manufacturer) {
-                    console.log(id, ' - ', manufacturer)
-                    currentValue = i
-                }
+
+            const manufacturersOptions = manufacturers.map((manufacturer, i, row) => {
+                const { name, id } = manufacturer
                 return { key: (i + 1), text: name, id: id, value: i }
-            });
+            })
 
-            setOptions(manufacturersOptions);
-            console.log('current: ', currentValue)
-            setCurrentManufacturer(currentValue)
+            setOptions(manufacturersOptions)
         })
-    }, []);
-
-    useEffect(() => {
-        if (options[currentManufacturer]) {
-            document.querySelector('#manufacturerSelect').value = options[currentManufacturer].text
-            setCurrentManufacturer(currentManufacturer);
-            console.log('chgandes to: ', options[currentManufacturer].text)
-        }
-    }, [currentManufacturer])
+    }, [])
 
     const [formValues, handleInputChange] = useForm({
-        newName: name,
-        from: lifeSpan && lifeSpan.split(' ')[0],
-        until: lifeSpan && lifeSpan.split(' ')[2],
-        newDescription: description,
-        newAmountProduced: amountProduced
+        name: "",
+        from: "",
+        until: "",
+        description: "",
+        amountProduced: ""
     });
 
-    const { newName, from, until, newDescription, newAmountProduced } = formValues;
+    const { name, from, until, description, amountProduced } = formValues;
 
     const handleAddNew = async () => {
-        const imageUrl = image;
+        if (file != null) {
+            const imageUrl = await fileUpload(file);
 
-        if (imageUrl != null) {
-            dispatch(UploadNewModel({
-                image: imageUrl,
-                name,
-                lifeSpan: from.concat(" - ", until),
-                description,
-                amountProduced,
-                manufacturer: options[currentManufacturer].id
-            }, navigate));
+            if (imageUrl != null) {
+                dispatch(uploadNewModel({
+                    image: imageUrl,
+                    name,
+                    lifeSpan: from.concat(" - ", until),
+                    description,
+                    amountProduced,
+                    manufacturer: options[currentManufacturer].id
+                }, navigate));
+            } else {
+                console.log("No url")
+            }
         } else {
-            console.log("No url")
+            console.log("No file")
         }
     };
 
     const changeDropOption = (event, data) => {
+        console.log(data.value)
         setCurrentManufacturer(data.value)
     }
 
@@ -83,11 +74,11 @@ const UpdateModels = () => {
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        // if (file) {
-        //     setCurrentFile(file)
-        // } else {
-        //     setCurrentFile(null)
-        // }
+        if (file) {
+            setCurrentFile(file)
+        } else {
+            setCurrentFile(null)
+        }
     }
 
     return (
@@ -116,7 +107,7 @@ const UpdateModels = () => {
                                         name="name"
                                         type="text"
                                         autoComplete="off"
-                                        value={newName}
+                                        value={name}
                                         onChange={handleInputChange}
                                     />
                                 </Segment>
@@ -157,7 +148,7 @@ const UpdateModels = () => {
                                         name="amountProduced"
                                         type="text"
                                         autoComplete="off"
-                                        value={newAmountProduced}
+                                        value={amountProduced}
                                         onChange={handleInputChange}
                                     />
                                 </Segment>
@@ -180,9 +171,9 @@ const UpdateModels = () => {
                                     </Form.Field>
                                 </Segment>
                                 <Segment color='teal' textAlign="center">
-                                    <Form.Select
-                                        fluid
-                                        id="manufacturerSelect"
+                                    <Form.Field
+                                        control={Select}
+                                        search
                                         label='Manufacturer'
                                         placeholder='Manufacturer'
 
@@ -201,7 +192,7 @@ const UpdateModels = () => {
                                         name="description"
                                         type="text"
                                         autoComplete="off"
-                                        value={newDescription}
+                                        value={description}
                                         onChange={handleInputChange}
                                     />
                                 </Segment>
@@ -216,7 +207,7 @@ const UpdateModels = () => {
                                     />
                                 </Segment>
                                 <Segment textAlign="center">
-                                    <Button secondary as={Link} to={`/models/${id}`}>Go Back</Button>
+                                    <Button secondary as={Link} to="/users/upload/">Go Back</Button>
                                 </Segment>
                             </Segment.Group>
                         </Segment.Group>
@@ -229,5 +220,5 @@ const UpdateModels = () => {
 };
 
 export {
-    UpdateModels as default
+    UploadModel as default
 };

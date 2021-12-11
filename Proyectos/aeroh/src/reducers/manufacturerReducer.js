@@ -16,6 +16,14 @@ const manufacturerReducer = (state = {}, action) =>{
                     ...action.payload
                 }
             }
+        case types.manufacturerDelete:
+            return {
+                ...state,
+                active: null,
+                manufacturerAdded: null
+            };
+        case types.manufacturerUpdate:
+            return state;
         default:
             return state;
     }

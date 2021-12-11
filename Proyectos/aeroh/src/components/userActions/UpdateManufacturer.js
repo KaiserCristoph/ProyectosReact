@@ -1,46 +1,40 @@
-import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Form, Grid, Header, Icon, Segment, Button } from "semantic-ui-react"
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from '../../hooks/useForm';
 
 import '../../styles/upload.css'
-import { fileUpload } from "../../helpers/fileUpload";
 import { Link } from "react-router-dom";
-import { uploadNewManufacturer } from "../../actions/manufacturers";
+import { updateManufacturer } from "../../actions/manufacturers";
 
-const UploadManufacturer = () => {
+const UploadModel = () => {
     const dispatch = useDispatch();
-    const [file, setCurrentFile] = useState(null)
     const navigate = useNavigate();
 
+    const { id, image, name, lifeSpan, description } = useSelector(state => state.manufacturer.active);
 
     const [formValues, handleInputChange] = useForm({
-        name: "",
-        from: "",
-        until: "",
-        description: "",
-        modelsAmount: ""
+        newName: name,
+        from: lifeSpan && lifeSpan.split(' ')[0],
+        until: lifeSpan && lifeSpan.split(' ')[2],
+        newDescription: description,
     });
 
-    const { name, from, until, description } = formValues;
+    const { newName, from, until, newDescription } = formValues;
 
-    const handleAddNew = async () => {
-        if (file != null) {
-            const imageUrl = await fileUpload(file);
+    const handleUpload = async () => {
+        const imageUrl = image;
 
-            if (imageUrl != null) {
-                await dispatch(uploadNewManufacturer({
-                    image: imageUrl,
-                    name,
-                    lifeSpan: from.concat(" - ", until),
-                    description
-                }, navigate))
-            } else {
-                console.log("No url")
-            }
+        if (imageUrl != null) {
+            await dispatch(updateManufacturer({
+                id,
+                image: imageUrl,
+                name: newName,
+                lifeSpan: from.concat(" - ", until),
+                description: newDescription
+            }, navigate))
         } else {
-            console.log("No file")
+            console.log("No url")
         }
     };
 
@@ -50,11 +44,11 @@ const UploadManufacturer = () => {
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            setCurrentFile(file)
-        } else {
-            setCurrentFile(null)
-        }
+        // if (file) {
+        //     setCurrentFile(file)
+        // } else {
+        //     setCurrentFile(null)
+        // }
     }
 
     return (
@@ -80,10 +74,10 @@ const UploadManufacturer = () => {
                                         iconPosition='left'
                                         label='Name'
                                         placeholder='Name...'
-                                        name="name"
+                                        name="newName"
                                         type="text"
                                         autoComplete="off"
-                                        value={name}
+                                        value={newName}
                                         onChange={handleInputChange}
                                     />
                                 </Segment>
@@ -130,10 +124,10 @@ const UploadManufacturer = () => {
 
                                         label='Description'
                                         placeholder='Add some history or facts about this manufacturer...'
-                                        name="description"
+                                        name="newDescription"
                                         type="text"
                                         autoComplete="off"
-                                        value={description}
+                                        value={newDescription}
                                         onChange={handleInputChange}
                                     />
                                 </Segment>
@@ -144,11 +138,11 @@ const UploadManufacturer = () => {
                                         primary
                                         content='Upload'
                                         type="submit"
-                                        onClick={handleAddNew}
+                                        onClick={handleUpload}
                                     />
                                 </Segment>
                                 <Segment textAlign="center">
-                                    <Button secondary as={Link} to="/users/upload/">Go Back</Button>
+                                    <Button secondary as={Link} to={`/manufacturers/${id}`}>Go Back</Button>
                                 </Segment>
                             </Segment.Group>
                         </Segment.Group>
@@ -161,5 +155,5 @@ const UploadManufacturer = () => {
 };
 
 export {
-    UploadManufacturer as default
+    UploadModel as default
 };

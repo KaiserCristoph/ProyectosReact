@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router";
-import { Container, Divider, Grid, Header, Icon, Image, Label, Segment } from "semantic-ui-react"
-import { activeManufacturer } from "../../actions/manufacturers";
+import { Link, useNavigate } from "react-router-dom";
+import { Button, Container, Divider, Grid, Header, Icon, Image, Label, Segment } from "semantic-ui-react"
+import { activeManufacturer, deleteManufacturer } from "../../actions/manufacturers";
 import { loadManufacturerById } from "../../helpers/loadManufacturers";
 import "../../styles/entPage.css"
 
-// const ManufacturerPage = ({ id, image, name, lifespan, description, modelsAmount }) => {
 const ManufacturerPage = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { manufacturerId } = useParams();
     const [manufacturer, setManufacturer] = useState({})
     
@@ -21,8 +22,11 @@ const ManufacturerPage = () => {
         })
     }, [])
 
-    const { image, name, lifeSpan, description } = manufacturer
+    const { id, image, name, lifeSpan, description } = manufacturer
 
+    const handleDelete = () => {
+        dispatch(deleteManufacturer(id, navigate));
+    }
     return (
         <>
             <Grid container columns={2}>
@@ -54,6 +58,22 @@ const ManufacturerPage = () => {
                                     </Grid.Column>
                                 </Grid>
                                 <Divider vertical><Icon name='industry' /></Divider>
+                            </Segment>
+                            <Segment>
+                                <Grid columns={2} container textAlign="center">
+                                    <Grid.Column verticalAlign='middle'>
+                                        <Button secondary content="Update"
+                                            as={Link} to={`/manufacturers/update/${id}`}
+                                        />
+                                    </Grid.Column>
+                                    <Grid.Column verticalAlign='middle'>
+                                        <Button
+                                            negative
+                                            content="Delete"
+                                            onClick={handleDelete}
+                                        />
+                                    </Grid.Column>
+                                </Grid>
                             </Segment>
                         </Container>
                     </Grid.Column>
